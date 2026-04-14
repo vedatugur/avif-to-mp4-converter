@@ -2,6 +2,18 @@
 
 A standalone Windows app that converts AVIF files (including animated AVIF) to MP4. Single `.exe`, no install, no dependencies — ffmpeg is bundled inside.
 
+## Getting `Converter.exe`
+
+The compiled `Converter.exe` is **not checked into this repository** (see [.gitignore](.gitignore)) — binaries don't belong in source control. You have two options:
+
+- **Download the latest release:** [Converter.exe (latest)](https://github.com/vedatugur/avif-to-mp4-converter/releases/latest/download/Converter.exe). Browse all versions on the [Releases page](https://github.com/vedatugur/avif-to-mp4-converter/releases).
+- **Build it yourself** from [`Converter.cs`](Converter.cs) — see [Rebuilding from source](#rebuilding-from-source-optional) below. Takes under a minute and needs nothing beyond what ships with Windows.
+
+## Requirements
+
+- Windows 10 or 11 (64-bit).
+- No runtime install needed — uses .NET Framework 4.x which ships with Windows.
+
 ## Usage
 
 1. Double-click **`Converter.exe`** to launch.
@@ -46,3 +58,16 @@ C:\Windows\Microsoft.NET\Framework64\v4.0.30319\csc.exe ^
 ```
 
 `csc.exe` ships with .NET Framework 4.x on every Windows 10/11 — no extra install needed.
+
+The `/resource:ffmpeg.exe,ffmpeg.exe` flag embeds `ffmpeg.exe` as a resource inside the output, which is why the final `Converter.exe` is self-contained.
+
+## Troubleshooting
+
+- **"Windows protected your PC" SmartScreen warning** — expected for unsigned binaries. Click *More info → Run anyway*.
+- **ffmpeg extraction fails** — make sure `%TEMP%\avif-to-mp4\` is writable, or clear that folder and relaunch.
+- **Output won't play in a specific app** — try CRF 15 or higher instead of CRF 0 (lossless uses a profile some Windows apps don't decode).
+
+## License & attribution
+
+- `ffmpeg` is bundled from the [BtbN GPL static builds](https://github.com/BtbN/FFmpeg-Builds/releases). ffmpeg is licensed under the GPL; redistributing `Converter.exe` means you are redistributing ffmpeg and should comply with its license terms.
+- No license file ships with this project yet — treat the source as "all rights reserved" unless the author adds one.

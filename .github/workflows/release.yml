@@ -1,0 +1,42 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-release:
+    runs-on: windows-latest
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Download ffmpeg (BtbN static build)
+        shell: pwsh
+        run: |
+          $url  = 'https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-master-latest-win64-gpl.zip'
+          $zip  = 'ffmpeg.zip'
+          Invoke-WebRequest -Uri $url -OutFile $zip
+          Expand-Archive -Path $zip -DestinationPath ffmpeg-extract -Force
+          $exe = Get-ChildItem -Path ffmpeg-extract -Filter ffmpeg.exe -Recurse | Select-Object -First 1
+          Copy-Item $exe.FullName -Destination ffmpeg.exe
+
+      - name: Compile Converter.exe
+        shell: cmd
+        run: |
+          C:\Windows\Microsoft.NET\Framework64\v4.0.30319\csc.exe ^
+            /target:winexe /out:Converter.exe ^
+            /reference:System.Windows.Forms.dll ^
+            /reference:System.Drawing.dll ^
+            /resource:ffmpeg.exe,ffmpeg.exe ^
+            Converter.cs
+
+      - name: Publish GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: Converter.exe
+          generate_release_notes: true
